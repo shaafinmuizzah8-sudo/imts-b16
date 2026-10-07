@@ -14,7 +14,7 @@ try {
 
     $data = [
         ["shaafin", "muizzah", "shaafinmuizzah8@gmail.com"],
-        ["muizzah", "shadir", "muizzahshadir@gmail.com"],
+        ["shadir", "mahroof", "muizzahshadir@gmail.com"],
         ["shaafin", "shadir", "shaafinshadir@gmail.com"]
     ];
 
@@ -31,3 +31,5 @@ try {
     $conn->rollback();
     echo "Error: " . $e->getMessage();
 }
+
+$conn = null;
