@@ -36,4 +36,25 @@ try {
     echo "Error: " . $e->getMessage();
 }
 
+echo "<br><br><br><br>";
+
+//multiple insert
+try {
+    $conn->beginTransaction();
+    $conn->exec("INSERT INTO users (firstname, lastname, email) 
+    VALUES ('muizzah', 'shadir', 'muizzahshadir@gmail.com')");
+
+    $conn->exec("INSERT INTO users (firstname, lastname, email) 
+    VALUES ('shaafin', 'shadir', 'shaafinshadir@gmail.com')");
+
+    $conn->exec("INSERT INTO users (firstname, lastname, email) 
+    VALUES ('shaafin', 'muizzah', 'shaafinmuizzah8@gmail.com')");
+
+    $conn->commit();
+    echo "Records inserted successfully";
+} catch (PDOException $e) {
+    $conn->rollback();
+    echo "Error: " . $e->getMessage();
+}
+
 $conn = null;
