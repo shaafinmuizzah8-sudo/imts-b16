@@ -45,11 +45,11 @@ try {
 
     foreach ($result as $row) {
         echo "<tr>";
-        echo "<td>" . htmlspecialchars($row['id']) . "</td>";
-        echo "<td>" . htmlspecialchars($row['firstname']) . "</td>";
-        echo "<td>" . htmlspecialchars($row['lastname']) . "</td>";
-        echo "<td>" . htmlspecialchars($row['email']) . "</td>";
-        echo "<td>" . htmlspecialchars($row['reg_date']) . "</td>";
+        echo "<td>" . $row['id'] . "</td>";
+        echo "<td>" . $row['firstname'] . "</td>";
+        echo "<td>" . $row['lastname'] . "</td>";
+        echo "<td>" . $row['email'] . "</td>";
+        echo "<td>" . $row['reg_date'] . "</td>";
         echo "</tr>";
     }
 } catch (PDOException $e) {
