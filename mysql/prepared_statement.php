@@ -32,4 +32,6 @@ try {
     echo "Error: " . $e->getMessage();
 }
 
+echo "<br><br><br><br>";
+
 $conn = null;
