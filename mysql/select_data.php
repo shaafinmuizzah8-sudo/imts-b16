@@ -11,8 +11,8 @@ echo "<table border='1'>
 </tr>";
 
 try {
-    $stmt = $conn->prepare("SELECT * FROM users");
-    $stmt->execute();
+    $stmt = $conn->prepare("SELECT * FROM users where lastname = :lastname");
+    $stmt->execute([':lastname' => 'muizzah']);
 
     $result = $stmt->fetchAll();
     foreach ($result as $row) {
