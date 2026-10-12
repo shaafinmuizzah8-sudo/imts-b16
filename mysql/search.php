@@ -1,58 +1,58 @@
-<?php
-include 'conex.php';
+<?php include 'conex.php';
 
-// search bar
 $search = trim($_GET['search'] ?? '');
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
+    $deleteId = filter_var($_POST['delete_id'], FILTER_VALIDATE_INT);
+    if ($deleteId !== false && $deleteId > 0) {
+        $stmt = $conn->prepare("DELETE FROM users WHERE id = :id");
+        $stmt->execute([':id' => $deleteId]);
+    }
+}
+
 echo "<form method='get'>";
-echo "<input type='search' name='search' value='" .
-    htmlspecialchars($search, ENT_QUOTES, 'UTF-8') . "' placeholder='Search users'>";
+echo "<input type='search' name='search' placeholder='Search users' value='" . htmlspecialchars($search, ENT_QUOTES, 'UTF-8') . "'>";
 echo "<button type='submit'>Search</button>";
 echo "</form>";
 
-echo "<table border='1'>
-<tr>
-    <th>ID</th>
-    <th>First Name</th>
-    <th>Last Name</th>
-    <th>Email</th>
+echo "<a href='create.php'>Create User</a> <br><br>";
+
+echo "<table border='1' cellpadding='10' cellspacing='0'>";
+echo "<tr><th>ID</th><th>First Name</th><th>Last Name</th><th>Email</th>
     <th>Registration Date</th>
-</tr>";
+    <th>Action</th></tr>";
 
 try {
-    if ($search !== '') {
-        $stmt = $conn->prepare(
-            "SELECT * FROM users
-             WHERE firstname LIKE :first
-                OR lastname  LIKE :last
-                OR email     LIKE :email"
-        );
-        $like = '%' . $search . '%';
-        $stmt->execute([
-            ':first' => $like,
-            ':last'  => $like,
-            ':email' => $like,
-        ]);
-    } else {
-        // no search term: show everyone
-        $stmt = $conn->query("SELECT * FROM users");
-    }
-
+    $stmt = $conn->prepare("SELECT * FROM users WHERE firstname LIKE :search OR lastname LIKE :search OR email LIKE :search ORDER BY reg_date DESC");
+    $stmt->execute(['search' => "%$search%"]);
     $result = $stmt->fetchAll();
+    if (empty($result)) {
+        echo "<tr><td colspan='6'>No users found</td></tr>";
+    } else {
+        foreach ($result as $row) {
+            echo "<tr>";
+            echo "<td>" . $row['id'] . "</td>";
+            echo "<td>" . $row['firstname'] . "</td>";
+            echo "<td>" . $row['lastname'] . "</td>";
+            echo "<td>" . $row['email'] . "</td>";
+            echo "<td>" . $row['reg_date'] . "</td>";
+            echo "<td>";
+            // Add a link to edit the user
+            echo "<a href='edit.php?id=" . (int) $row['id'] . "'>Edit</a><br><br>";
 
-    if (count($result) === 0) {
-        echo "<tr><td colspan='5'>No users found</td></tr>";
-    }
+            // Add a form to delete the user with confirmation
+            echo "<form method='post' 
+        onsubmit=\"return confirm('Are you sure you want to delete this user?');\">";
+            echo "<input type='hidden' name='delete_id' value='" . (int) $row['id'] . "'>";
+            echo "<button type='submit'>Delete</button>";
+            echo "</form>";
 
-    foreach ($result as $row) {
-        echo "<tr>";
-        echo "<td>" . $row['id'] . "</td>";
-        echo "<td>" . $row['firstname'] . "</td>";
-        echo "<td>" . $row['lastname'] . "</td>";
-        echo "<td>" . $row['email'] . "</td>";
-        echo "<td>" . $row['reg_date'] . "</td>";
-        echo "</tr>";
+            echo "</td>";
+            echo "</tr>";
+        }
     }
 } catch (PDOException $e) {
-    echo "<tr><td colspan='5'>Error: " . htmlspecialchars($e->getMessage()) . "</td></tr>";
+    echo "Error: " . $e->getMessage();
 }
 echo "</table>";
+$conn = null;
